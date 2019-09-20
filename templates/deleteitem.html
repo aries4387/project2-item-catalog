@@ -1,0 +1,21 @@
+{% extends 'main.html' %}
+{% block content %}
+{% include 'header.html' %}
+	<section class="main-content grid-container">
+        <div class="grid-x grid-padding-x">
+            <div class="cell">
+                <div class="form-box">
+			<form class="" method="post">
+				<h3>Are you sure you want to delete {{item.title}}?</h3>
+				<div class="btns">
+					<button type="submit" class="button delete-button">Delete</button>
+					<a class="button cancel-button" href="{{url_for('viewCategories')}}">Cancel</a>
+				</div>
+			</form>
+		</div>
+            </div>
+        </div>
+
+	</section>
+    {% include 'footer.html' %}
+{% endblock %}

@@ -1,0 +1,92 @@
+{% extends 'main.html' %}
+{% block content %}
+{% include 'header.html' %}
+	<section class="main-content grid-container">
+        <div class="grid-x">
+            <div class="cell medium-4">
+                <h2>Categories</h2>
+            </div>
+        </div>
+        <div class="grid-x">
+            <div class="cell medium-4 tabs-outer">
+
+                        <ul class="vertical tabs" data-tabs id="example-tabs">
+
+                            {% for category in categories %}
+                                {% if loop.index == 1 %}
+                                    <li class="tabs-title is-active"><a href="#panel{{ loop.index }}v" aria-selected="true">{{ category.name }}</a></li>
+                                {% else %}
+                                    <li class="tabs-title"><a href="#panel{{ loop.index }}v" aria-selected="false">{{ category.name }}</a></li>
+                                {% endif %}
+
+                            {% endfor %}
+                        </ul>
+
+            </div>
+            <div class="cell medium-8 tabs-content-outer">
+
+                <div class="tabs-content" data-tabs-content="example-tabs">
+                        {% for category in categories %}
+                            {% if loop.index == 1 %}
+                                <div class="tabs-panel is-active" id="panel{{ loop.index }}v">
+                                  {% if result[category.name] != null %}
+                                        {% for item in result[category.name] %}
+                                            <p><a data-open="viewItem{{ item.id }}">{{ item.title }}</a></p>
+                                            <div class="reveal" id="viewItem{{ item.id }}" data-reveal>
+                                                  <h1>{{ item.title }}</h1>
+                                                  <p class="lead">{{ item.description }}</p>
+                                                    {% if current_user.is_authenticated %}
+                                                        <p><a class="button edit-button" href="{{url_for('editItem', category_id = category.id, item_id = item.id )}}">Edit Item</a>
+                                                            <a class="button delete-button" href="{{url_for('deleteItem', category_id = category.id, item_id = item.id )}}">Delete Item</a>
+                                                        </p>
+                                                    {% endif %}
+                                                    <button class="close-button" data-close aria-label="Close modal" type="button">
+                                                    <span aria-hidden="true">&times;</span>
+                                                  </button>
+                                            </div>
+                                        {% endfor %}
+                                  {% else %}
+                                      <p>No items yet!</p>
+                                  {% endif %}
+                                    {% if current_user.is_authenticated %}
+                                <p><a class="button add-button" href="{{url_for('addItem', category_id = category.id )}}">Add Item to this category</a></p>
+                            {% endif %}
+                                </div>
+
+                            {% else %}
+                                <div class="tabs-panel" id="panel{{ loop.index }}v">
+                                  {% if result[category.name] != null %}
+                                        {% for item in result[category.name] %}
+                                            <p><a data-open="viewItem{{ item.id }}">{{ item.title }}</a></p>
+                                            <div class="reveal" id="viewItem{{ item.id }}" data-reveal>
+                                                  <h1>{{ item.title }}</h1>
+                                                  <p class="lead">{{ item.description }}</p>
+                                                    {% if current_user.is_authenticated %}
+                                                        <p><a class="button edit-button" href="{{url_for('editItem', category_id = category.id, item_id = item.id )}}">Edit Item</a>
+                                                        <a class="button delete-button" href="{{url_for('deleteItem', category_id = category.id, item_id = item.id )}}">Delete Item</a>
+                                                        </p>
+                                                    {% endif %}
+                                                    <button class="close-button" data-close aria-label="Close modal" type="button">
+                                                    <span aria-hidden="true">&times;</span>
+                                                  </button>
+                                            </div>
+                                        {% endfor %}
+                                  {% else %}
+                                      <p>No items yet!</p>
+                                  {% endif %}
+                                {% if current_user.is_authenticated %}
+                                <p><a class="button add-button" href="{{url_for('addItem', category_id = category.id )}}">Add Item to this category</a></p>
+                            {% endif %}
+                                </div>
+
+                            {% endif %}
+
+                        {% endfor %}
+                </div>
+            </div>
+        </div>
+
+
+	</section>
+    {% include 'footer.html' %}
+{% endblock %}

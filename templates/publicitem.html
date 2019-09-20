@@ -1,0 +1,22 @@
+{% extends 'main.html' %}
+{% block content %}
+{% include 'header.html' %}
+	<section class="container">
+		{% if categories != [] %}	
+			{% if items != [] %}
+				<div class="item-card">
+					<div class="item-info">
+						<h3>{{item.title}}</h3>
+						<p>{{item.description}}</p>
+					</div>
+				</div>
+				<a class="back-btn" href="{{url_for('viewItems', category_id = category_id)}}"><i class="fas fa-arrow-left"></i> <span>Back to {{item.category.name}}</span></a>
+			{% else %}
+				<p>No Item</p>
+				<a class="back-btn" href="{{url_for('viewItems', category_id = category_id)}}"><i class="fas fa-arrow-left"></i> <span>Back to {{item.category.name}}</span></a>
+			{% endif %}
+		{% else %}
+			<p>No category</p>
+		{% endif %}
+	</section>
+{% endblock %}

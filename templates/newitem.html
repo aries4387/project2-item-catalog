@@ -1,0 +1,29 @@
+{% extends 'main.html' %}
+{% block content %}
+{% include 'header.html' %}
+	<section class="main-content grid-container">
+        <div class="grid-x grid-padding-x">
+            <div class="cell">
+                <div class="form-box">
+			<form class="add-form" action="{{url_for('addItem',category_id=category_id)}}" method='post'>
+				<h2>Add New Item</h2>
+				<div class="form-group">
+					<label for="name">Title:</label>
+					<input type="text" name="name" placeholder="ex: health care" onfocus="this.placeholder=''" onblur="this.placeholder='ex: health care'">
+				</div>
+				<div class="form-group">
+					<label for="description">Description:</label>
+					<textarea rows="4" name="description" placeholder="ex: " onfocus="this.placeholder=''" onblur="this.placeholder='ex: '"></textarea>
+				</div>
+				<div class="btns">
+					<button type="submit" class="button add-button">Add</button>
+					<a class="button cancel-button" href="{{url_for('viewCategories')}}">Cancel</a>
+				</div>
+			</form>
+		</div>
+            </div>
+        </div>
+
+	</section>
+    {% include 'footer.html' %}
+{% endblock %}

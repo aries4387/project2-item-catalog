@@ -1,0 +1,29 @@
+{% extends 'main.html' %}
+{% block content %}
+{% include 'header.html' %}
+		<section class="main-content grid-container">
+            <div class="grid-x grid-padding-x">
+                <div class="cell">
+                    <div class="form-box">
+				<form class="add-form" action="#" method="post">
+					<h2>Edit Item</h2>
+					<div class="form-group">
+						<label for="title">Title:</label>
+						<input type="text" value="{{item.title}}" name="title" placeholder="ex:" onfocus="this.placeholder=''" onblur="this.placeholder='ex:'">
+					</div>
+					<div class="form-group">
+						<label for="description">Description:</label>
+						<textarea rows="4" name="description" placeholder="ex: " onfocus="this.placeholder=''" onblur="this.placeholder='ex:'">{{ item.description.strip() }}</textarea>
+					</div>
+					<div class="btns">
+						<button type="submit" class="button save-button">Save</button>
+						<a class="button cancel-button" href="{{url_for('viewCategories')}}">Cancel</a>
+					</div>
+				</form>
+			</div>
+                </div>
+            </div>
+
+		</section>
+    {% include 'footer.html' %}
+{% endblock %}
