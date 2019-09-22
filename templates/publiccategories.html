@@ -35,7 +35,7 @@
                                             <div class="reveal" id="viewItem{{ item.id }}" data-reveal>
                                                   <h1>{{ item.title }}</h1>
                                                   <p class="lead">{{ item.description }}</p>
-                                                    {% if current_user.is_authenticated %}
+                                                    {% if current_user.is_authenticated and current_user.get_id() == item.user_id %}
                                                         <p><a class="button edit-button" href="{{url_for('editItem', category_id = category.id, item_id = item.id )}}">Edit Item</a>
                                                             <a class="button delete-button" href="{{url_for('deleteItem', category_id = category.id, item_id = item.id )}}">Delete Item</a>
                                                         </p>
@@ -61,7 +61,7 @@
                                             <div class="reveal" id="viewItem{{ item.id }}" data-reveal>
                                                   <h1>{{ item.title }}</h1>
                                                   <p class="lead">{{ item.description }}</p>
-                                                    {% if current_user.is_authenticated %}
+                                                    {% if current_user.is_authenticated and current_user.get_id() == item.user_id %}
                                                         <p><a class="button edit-button" href="{{url_for('editItem', category_id = category.id, item_id = item.id )}}">Edit Item</a>
                                                         <a class="button delete-button" href="{{url_for('deleteItem', category_id = category.id, item_id = item.id )}}">Delete Item</a>
                                                         </p>

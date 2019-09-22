@@ -29,8 +29,8 @@ os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
 # Configuration
 # GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", None)
-GOOGLE_CLIENT_ID = "72634954769-a83u9pdi2kuhn9qqdrslju70r0qpm1uh.apps.googleusercontent.com"
-GOOGLE_CLIENT_SECRET = "g_RHm9D4nmUH3tCAqwSg09a9"
+GOOGLE_CLIENT_ID = "YOUR_CLIENT_ID_HERE.apps.googleusercontent.com"
+GOOGLE_CLIENT_SECRET = "YOUR_CLIENT_SECRET"
 GOOGLE_DISCOVERY_URL = (
     "https://accounts.google.com/.well-known/openid-configuration"
 )
@@ -146,6 +146,13 @@ def logout():
 
 @app.route('/categories/JSON')
 def categoriesJSON():
+    """
+    return categories as a JSON object
+
+    args: none
+
+    return: JSON object with categories
+    """
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
     categories = session.query(Category).all()
@@ -154,6 +161,14 @@ def categoriesJSON():
 
 @app.route('/categories/<int:category_id>/items/JSON')
 def categoryItemsJSON(category_id):
+    """
+    Returns JSON of selected item in a category
+
+    args: category id
+
+    return: JSON object containing items belonging to a category
+
+    """
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
     category = session.query(Category).filter_by(id=category_id).one()
@@ -163,6 +178,14 @@ def categoryItemsJSON(category_id):
 
 @app.route('/categories/<int:category_id>/items/<int:item_id>/JSON')
 def itemJSON(category_id, item_id):
+    """
+    Returns JSON containging a single item belonging to a particular category
+
+    args: category id, item id
+
+    return: JSON object containing  a single item in a specified category
+
+    """
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
     item = session.query(Item).filter_by(id=item_id).first()
@@ -172,111 +195,60 @@ def itemJSON(category_id, item_id):
 @app.route('/')
 @app.route('/categories')
 def viewCategories():
+    """
+    Displays categories along with items belonging to these categories
+
+    args: none
+
+    return: passes object containing categories, items and item details to
+    the publiccategories template.
+
+    """
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
-    
+
     categories = session.query(Category).all()
     allitems = session.query(Item).all()
     currentUserID = current_user.get_id()
 
+    # set up a dictionary with category name as key
     result = {}
 
     for category in categories:
-        categoryItems = session.query(Item).filter(Item.category_id == category.id).all()
+        # gets items for a category
+        categoryItems = session.query(
+                                      Item).filter(Item.category_id == category.id).all()
+        # store items in the dictionary
         result[category.name] = categoryItems
     items = session.query(Item).order_by(Item.id.desc())
-    if 'username' not in login_session:
-        return render_template('publiccategories.html', categories=categories, items=items, result=result,
-                               userid=currentUserID)
-    else:
-        return render_template('category.html', categories=categories, items=items)
 
-
-@app.route('/categories/add', methods=['GET', 'POST'])
-def addCategory():
-    DBSession = sessionmaker(bind=engine)
-    session = DBSession()
-    if 'username' not in login_session:
-        return redirect('/login')
-    if request.method == 'POST':
-        newCategory = Category(name=request.form['name'], user_id=login_session['user_id'])
-        session.add(newCategory)
-        session.commit()
-        return redirect(url_for('viewCategories'))
-    else:
-        return render_template('newcategory.html')
-
-
-@app.route('/categories/<int:category_id>/edit', methods=['GET', 'POST'])
-def editCategory(category_id):
-    DBSession = sessionmaker(bind=engine)
-    session = DBSession()
-    editedCategory = session.query(Category).filter_by(id=category_id).one()
-    if 'username' not in login_session:
-        return redirect('/login')
-    if editedCategory.user_id != login_session['user_id']:
-        return "<script>function myFunction() {alert('You are not authorized to edit this category. Please create your own category in order to edit.');}</script><body onload='myFunction()'>"
-    if request.method == 'POST':
-        if request.form['name']:
-            editedCategory.name = request.form['name']
-        session.add(editedCategory)
-        session.commit()
-        return redirect(url_for('viewCategories'))
-    else:
-        return render_template('editcategory.html', category=editedCategory)
-
-
-@app.route('/categories/<int:category_id>/delete', methods=['GET', 'POST'])
-def deleteCategory(category_id):
-    DBSession = sessionmaker(bind=engine)
-    session = DBSession()
-    categoryToDelete = session.query(Category).filter_by(id=category_id).one()
-    if 'username' not in login_session:
-        return redirect('/login')
-    if categoryToDelete.user_id != login_session['user_id']:
-        return "<script>function myFunction() {alert('You are not authorized to delete this restaurant. Please create your own restaurant in order to delete.');}</script><body onload='myFunction()'>"
-    if request.method == 'POST':
-        session.delete(categoryToDelete)
-        session.commit()
-        return redirect(url_for('viewCategories', category_id=category_id))
-    else:
-        return render_template('deletecategory.html', category=categoryToDelete)
-
-
-@app.route('/categories/<int:category_id>')
-@app.route('/categories/<int:category_id>/items')
-def viewItems(category_id):
-    DBSession = sessionmaker(bind=engine)
-    session = DBSession()
-    category = session.query(Category).filter_by(id=category_id).one()
-    items = session.query(Item).filter_by(category_id=category.id).all()
-    if 'username' not in login_session:
-        return render_template('publiccatitem.html', category=category, items=items, category_id=category.id)
-    else:
-        return render_template('categoryitems.html', category=category, items=items, category_id=category.id)
-
-
-@app.route('/categories/<int:category_id>/items/<int:item_id>')
-def viewItem(category_id, item_id):
-    DBSession = sessionmaker(bind=engine)
-    session = DBSession()
-    clickedItem = session.query(Item).filter_by(id=item_id).one()
-    if 'username' not in login_session:
-        return render_template('publicitem.html', category_id=category_id, item_id=item_id, item=clickedItem)
-    else:
-        return render_template('item.html', category_id=category_id, item_id=item_id, item=clickedItem)
+    return render_template('publiccategories.html',
+                           categories=categories,
+                           items=items, result=result,
+                           userid=currentUserID)
 
 
 @app.route('/categories/<int:category_id>/add', methods=['GET', 'POST'])
 def addItem(category_id):
+    """
+    Adds a new item to specified category after checking if the user is
+    authenticated
+
+    args: category id
+
+    return: form to add a new item if logged in or adds the item and return
+    the user back to home after adding an item
+    """
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
     category = session.query(Category).filter_by(id=category_id).one()
-    loggedinuser = current_user.get_id();
+    loggedinuser = current_user.get_id()
     if not current_user.is_authenticated:
         return redirect('/login')
     if request.method == 'POST':
-        newItem = Item(title=request.form['name'], description=request.form['description'], category_id=category_id,
+        newItem = Item(title=request.form['name'],
+                       description=request.form['description'],
+                       category_id=category_id,
                        user_id=loggedinuser)
         session.add(newItem)
         session.commit()
@@ -285,8 +257,19 @@ def addItem(category_id):
         return render_template('newitem.html', category_id=category_id)
 
 
-@app.route('/categories/<int:category_id>/items/<int:item_id>/edit', methods=['GET', 'POST'])
+@app.route('/categories/<int:category_id>/items/<int:item_id>/edit',
+           methods=['GET', 'POST'])
 def editItem(category_id, item_id):
+    """
+    Allows a user to edit an item if user is logged in and is the author
+    of the item.
+
+    args: category id, item id
+
+    return: form to edit a new item if logged in and author of the item
+    or edits the item and return
+    the user back to home after editing an item
+    """
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
     editedItem = session.query(Item).filter_by(id=item_id).one()
@@ -295,6 +278,9 @@ def editItem(category_id, item_id):
     if not current_user.is_authenticated:
         return redirect('/login')
 
+    # checks if the logged in user is the author of the item
+    if current_user.get_id() != editedItem.user_id:
+        return 'You are not allowed to edit this entry'
     if request.method == 'POST':
         if request.form['title']:
             editedItem.title = request.form['title']
@@ -304,11 +290,25 @@ def editItem(category_id, item_id):
         session.commit()
         return redirect(url_for('viewCategories'))
     else:
-        return render_template('edititem.html', category_id=category_id, item_id=item_id, item=editedItem)
+        return render_template('edititem.html',
+                               category_id=category_id,
+                               item_id=item_id,
+                               item=editedItem)
 
 
-@app.route('/categories/<int:category_id>/items/<int:item_id>/delete', methods=['GET', 'POST'])
+@app.route('/categories/<int:category_id>/items/<int:item_id>/delete',
+           methods=['GET', 'POST'])
 def deleteItem(category_id, item_id):
+    """
+    Allows a user to delete an item if user is logged in and is the author
+    of the item.
+
+    args: category id, item id
+
+    return: form to delete the item if logged in and author of the item
+    or deletes the item and return
+    the user back to home after deleting an item
+    """
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
     category = session.query(Category).filter_by(id=category_id).one()
@@ -316,7 +316,8 @@ def deleteItem(category_id, item_id):
     currentUserID = current_user.get_id()
     if not current_user.is_authenticated:
         return redirect('/login')
-
+    if current_user.get_id() != itemToDelete.user_id:
+        return 'You are not allowed to delete this entry.'
     if request.method == 'POST':
         session.delete(itemToDelete)
         session.commit()
