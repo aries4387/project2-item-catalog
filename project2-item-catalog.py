@@ -43,7 +43,7 @@ login_manager.init_app(app)
 CLIENT_ID = json.loads(open('client_secrets.json',
                             'r').read())['web']['client_id']
 
-engine = create_engine('sqlite:///itemcatalog.db')
+engine = create_engine('postgresql://catalog:password@localhost/catalog')
 Base.metadata.bind = engine
 
 DBSession = sessionmaker(bind=engine)
